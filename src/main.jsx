@@ -1,6 +1,7 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {createRoot} from "react-dom/client";
 import "./styles.css";
+import NominationForm from "./NominationForm";
 
 const stories=[
  {id:"kalamkari",place:"Srikalahasti, India",skill:"Kalamkari",local:"కలంకారి",person:"A living textile tradition",quote:"The line begins before the colour.",status:"Endangered knowledge",years:"Generations of practice",image:"https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=1600&q=85",category:"Textile",story:"Kalamkari is more than a finished cloth. It carries drawing, mordanting, washing, dye preparation and judgement learned through repeated practice. This prototype story shows how the platform will place the practitioner and their own account before an encyclopedia description.",lineage:["Teacher / family elder","Current practitioner","Apprentice / next generation"],remember:"How the cloth feels after each wash — something a written recipe cannot fully teach."},
@@ -54,7 +55,7 @@ function Home({open}){
    <div className="principleGrid"><div><b>01</b><h3>People before content</h3><p>The practitioner is not raw material for a platform. Their voice, consent and context come first.</p></div><div><b>02</b><h3>Original voice stays</h3><p>Record in the language a person actually speaks. Translation helps others listen; it never replaces the original.</p></div><div><b>03</b><h3>Not everything belongs online</h3><p>Communities decide what can be public, taught, commercial, restricted, sacred or not recorded at all.</p></div></div>
   </section>
 
-  <section className="nominate" id="nominate"><div><p className="eyebrow">Help us find what is being missed</p><h2>Do you know a skill that should not disappear?</h2></div><div><p>A nomination is a starting point, not automatic publication. Every claim needs human verification and practitioner consent.</p><a href="mailto:hello@livingskillslineage.org?subject=Nominate%20a%20living%20skill" className="primary">Nominate a living skill →</a></div></section>
+  <section className="nominateShell" id="nominate"><NominationForm/></section>
  </main>
 }
 
