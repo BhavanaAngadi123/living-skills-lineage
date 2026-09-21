@@ -1,19 +1,25 @@
 import React, {useState} from "react";
 import {emptyNomination, validateNomination} from "./domain";
+import {backendConfigured, submitNomination} from "./lib/supabase";
 
 export default function NominationForm(){
  const [value,setValue]=useState({...emptyNomination});
  const [errors,setErrors]=useState({});
  const [sent,setSent]=useState(false);
+ const [busy,setBusy]=useState(false);
+ const [serviceMessage,setServiceMessage]=useState("");
  const change=e=>{const {name,type,checked,value:v}=e.target;setValue(x=>({...x,[name]:type==="checkbox"?checked:v}))};
- const submit=e=>{
-  e.preventDefault();
+ const submit=async e=>{
+  e.preventDefault(); setServiceMessage("");
   const next=validateNomination(value); setErrors(next);
   if(Object.keys(next).length) return;
-  // Prototype: no personal data is transmitted until a reviewed backend exists.
-  setSent(true);
+  if(!backendConfigured){setSent(true);return;}
+  setBusy(true);
+  const result=await submitNomination(value);
+  setBusy(false);
+  if(result.ok) setSent(true); else setServiceMessage(result.message);
  };
- if(sent) return <div className="formSuccess"><p className="eyebrow">Nomination prepared</p><h3>Thank you for noticing this knowledge.</h3><p>This prototype intentionally does not transmit personal information yet. A production submission service will only launch after privacy, consent and editorial review controls are connected.</p><button onClick={()=>{setSent(false);setValue({...emptyNomination})}}>Nominate another</button></div>;
+ if(sent) return <div className="formSuccess"><p className="eyebrow">Nomination prepared</p><h3>Thank you for noticing this knowledge.</h3><p>Your nomination has been prepared${backendConfigured ? " and securely submitted for editorial review" : " locally"}. ${backendConfigured ? "It will not be published automatically." : "This deployment is not connected to the secure submission service yet, so no personal information was transmitted."}</p><button onClick={()=>{setSent(false);setValue({...emptyNomination})}}>Nominate another</button></div>;
  const field=(label,name,required=false,placeholder="")=><label>{label}{required&&<b> *</b>}<input name={name} value={value[name]} onChange={change} placeholder={placeholder}/>{errors[name]&&<small>{errors[name]}</small>}</label>;
  return <form className="nominationForm" onSubmit={submit}>
   <div className="formIntro"><p className="eyebrow">Nominate living knowledge</p><h2>Tell us what the world may be missing.</h2><p>A nomination is private editorial input. It is <b>not</b> automatically published and it does not make an endangered-status claim.</p></div>
@@ -29,6 +35,6 @@ export default function NominationForm(){
    {field("How can the editorial team contact you?","contact",true,"Email or other preferred contact")}
    <label className="check full"><input type="checkbox" name="permissionToContact" checked={value.permissionToContact} onChange={change}/><span>You may contact me about this nomination. My contact information should remain private.</span>{errors.permissionToContact&&<small>{errors.permissionToContact}</small>}</label>
   </div>
-  <button className="primary" type="submit">Prepare nomination →</button>
+  {serviceMessage&&<p className="serviceError">{serviceMessage}</p>}<button className="primary" type="submit" disabled={busy}>{busy?"Submitting securely…":backendConfigured?"Submit for private review →":"Prepare nomination →"}</button>
  </form>
 }
